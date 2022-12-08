@@ -47,10 +47,10 @@ fun ls(i_start: Int, input: List<String>, curNode: Node): Int {
             continue
         }
 
-        var size = if (line[0] == "dir") 0 else line[0].toInt()
-        var type = if (line[0] == "dir") Type.dir else Type.file
-
+        val size = if (line[0] == "dir") 0 else line[0].toInt()
+        val type = if (line[0] == "dir") Type.dir else Type.file
         curNode.children[name] = Node(name, type, size, curNode)
+
         i++
     }
 

@@ -5,7 +5,8 @@
 //import day4.init
 //import day5.init
 //import day6.init
-import day7.init
+//import day7.init
+import day8.init
 
 fun main() {
     init()

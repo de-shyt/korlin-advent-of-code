@@ -57,13 +57,22 @@ fun ls(i_start: Int, input: List<String>, curNode: Node): Int {
     return i
 }
 
-var answer = 0
-
-fun get_asnwer(curNode: Node) {
+fun get_filesize_sum(curNode: Node): Int {
+    var answer = 0
     if (curNode.size <= 100000) answer += curNode.size
     for (elem in curNode.children.values)
         if (elem.type == Type.dir)
-            get_asnwer(elem)
+             answer += get_filesize_sum(elem)
+    return answer
+}
+
+fun find_directories(curNode: Node, free_space: Int): List<Int> {
+    val answer = mutableListOf<Int>()
+    if (curNode.size+ free_space >= 30000000) answer += listOf(curNode.size)
+    for (elem in curNode.children.values)
+        if (elem.type == Type.dir)
+            answer += find_directories(elem, free_space)
+    return answer
 }
 
 fun init() {
@@ -91,7 +100,7 @@ fun init() {
 
     recalc_size(root)
 
-    get_asnwer(root)
+    println(get_filesize_sum(root))
 
-    println(answer)
+    println(find_directories(root, 70000000 - root.size).min())
 }

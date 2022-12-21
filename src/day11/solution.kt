@@ -1,22 +1,12 @@
 package day11
 
 import java.io.File
-import java.io.InputStream
-import kotlin.math.floor
 
-fun createLambda(op: Char, value: Long?): (Long) -> Long {
-    return if (op == '+') { x: Long ->
-        x + (value ?: x)
-    }
-    else { x: Long ->
-        x * (value ?: x)
-    }
-}
-
-fun createGetNextFunction(condition: Long, ifTrue: Long, ifFalse: Long): (Long) -> Int =
-    { x: Long ->
-        if (x % condition == 0L) ifTrue.toInt() else ifFalse.toInt()
-    }
+val starting = 1
+val operation = 2
+val test = 3
+val ifTrue = 4
+val ifFalse = 5
 
 fun init() {
     val input = File("src/day11/input.txt").inputStream()
@@ -32,7 +22,7 @@ fun init() {
 
     val monkeys: MutableList<Monkey> = mutableListOf()
 
-    val totalAmount: MutableList<Long> = MutableList(MONKEYS_AMOUNT) { 0 }
+    val totalAmount: MutableList<Long> = MutableList(MONKEYS_AMOUNT) { 0L }
 
     input.forEach { curMonkey ->
         monkeys.add(
@@ -44,18 +34,22 @@ fun init() {
                 ),
                 createGetNextFunction(
                     curMonkey[test][0].toLong(),
-                    curMonkey[ifTrue][0].toLong(),
-                    curMonkey[ifFalse][0].toLong()
+                    curMonkey[ifTrue][0].toInt(),
+                    curMonkey[ifFalse][0].toInt()
                 )
             )
         )
     }
 
-    repeat(20) {
+    val MODULO = input.map { it[3][0].toLong() }.fold(1, Long::times)
+
+    repeat(REPEAT_AMOUNT) {
         monkeys.forEachIndexed { index, monkey ->
             monkey.holds.forEach {
                 totalAmount[index]++
-                var worryLevel = monkey.operation(it) / 3
+                var worryLevel = monkey.operation(it)
+//                worryLevel /= 3
+                worryLevel %= MODULO
                 monkeys[monkey.getNext(worryLevel)].holds.add(worryLevel)
             }
             monkey.holds.clear()
@@ -66,6 +60,7 @@ fun init() {
 }
 
 val MONKEYS_AMOUNT = 8
+val REPEAT_AMOUNT= 10000
 
 data class Monkey(
     val holds: MutableList<Long>,
@@ -73,8 +68,16 @@ data class Monkey(
     val getNext: (Long) -> Int
 )
 
-val starting = 1
-val operation = 2
-val test = 3
-val ifTrue = 4
-val ifFalse = 5
+fun createLambda(op: Char, value: Long?): (Long) -> Long {
+    return if (op == '+') { x: Long ->
+        x + (value ?: x)
+    }
+    else { x: Long ->
+        x * (value ?: x)
+    }
+}
+
+fun createGetNextFunction(condition: Long, ifTrue: Int, ifFalse: Int): (Long) -> Int =
+    { x: Long ->
+        if (x % condition == 0L) ifTrue else ifFalse
+    }
